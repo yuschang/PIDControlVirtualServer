@@ -211,7 +211,7 @@ public class IPC_ServerControl implements Runnable {
         double frameRT = Double.parseDouble(view.frameRate) * 1000;
         int delay = (int) frameRT;
                
-      
+       //
 
         ActionListener timerTask = new ActionListener(){
       
