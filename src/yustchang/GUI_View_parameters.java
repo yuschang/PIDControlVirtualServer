@@ -267,15 +267,17 @@ public class GUI_View_parameters extends javax.swing.JFrame {
         model.croppedTmapSize[0] = 126;
         model.croppedTmapSize[1] = 40;
         
-        model.targetDose = 300;
+        model.targetDose = 100 ;
         model.targetDose -= model.getCooldownDose(model.baseTemp);
-        model.targetTemp = 50;
+        model.targetTemp = 48 ;
         model.roi_doseMap = new double[model.roi_window_size*2+1][model.roi_window_size*2+1];
         model.g_roi_doseMap = new double[model.roi_window_size*2+1][model.roi_window_size*2+1];
         
         model.pGain = 1.5;
         model.iGain = 1.2;
         model.dGain = 0.7;    
+        
+        model.roiGaussianFilterRequired = true;
         
         setText("*** Initial parameter were defined : ");
         setText("roi_start_point -- " + model.roi_start_point);

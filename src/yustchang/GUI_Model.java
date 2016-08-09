@@ -322,6 +322,7 @@ public class GUI_Model {
     double g_maxAvt = 0; 
     double SumTemp = 0;
     int numbeCount = 0;
+    double g_avTemp = 0;
     
     int startPoint= roi_start_point-roi_window_size;
     int endPoint = roi_start_point+roi_window_size+1;
@@ -344,7 +345,8 @@ public class GUI_Model {
                 }
                 
                 // for gaussian filtered CEM map
-                double g_avTemp = gaussian3(i,j,tmapData);
+                g_avTemp = gaussian3(i,j,tmapData);
+                print("!!! g_avTemp is :" + g_avTemp);
                 g_roi_doseMap[i-startPoint][j-startPoint] += getPixelDose(g_avTemp); 
                 
                 if(g_avTemp > g_maxAvt){   
@@ -370,8 +372,16 @@ public class GUI_Model {
         }
     }
      
-    mean_temp = SumTemp/ numbeCount;
-    max_temp = maxAvt;
+    // mean_temp = SumTemp/ numbeCount;
+    // max_temp = maxAvt;
+    if(roiGaussianFilterRequired == true){
+        mean_temp = g_maxAvt;
+    
+    }else{
+        mean_temp = SumTemp/ numbeCount;
+    }
+
+    max_temp = tmapData[g_maxTempCoordi[1]][g_maxTempCoordi[0]];
 
     roi_doseMapImag = arrary2BuffImage(double2Float(roi_doseMap),10);
     
@@ -492,8 +502,16 @@ public class GUI_Model {
     
     public void updateTracker(){
     
-       rectangCoordi = rectangleCoordiConvertor();     
-       crossCoordi = crossCoordiConvertor( maxTempCoordi ,10);
+    rectangCoordi = rectangleCoordiConvertor();     
+    
+    if(roiGaussianFilterRequired == true){
+        // tracker based on gaussian filtered tmap
+       crossCoordi = crossCoordiConvertor( g_maxTempCoordi ,10); 
+    }else{
+        
+       crossCoordi = crossCoordiConvertor( maxTempCoordi ,10); 
+    }
+       
        
        crossCoordi_cem = crossCoordiConvertor( maxDoseCoordi , 5);
 
@@ -552,7 +570,8 @@ public class GUI_Model {
         gaussianAv += matrix[x-1][y+1];
         gaussianAv += matrix[x-1][y-1];
         
-      return gaussianAv/16;
+      return (gaussianAv/16);
+              
     }
        
     ///  For Dose calcualtion
