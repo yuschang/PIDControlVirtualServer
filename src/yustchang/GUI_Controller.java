@@ -10,12 +10,14 @@ import javax.swing.Timer;
 
 
 
+
 public class GUI_Controller {
     
     private GUI_Model model;
     private GUI_View view;
     private Timer timer;
     private PID_Controller pidControl;
+
     private GUI_Chart chart;
     private File_Writter fileWrite;
     private File_Writter fileWrite2;  
@@ -39,8 +41,9 @@ public class GUI_Controller {
          fileWrite = new File_Writter(model);
         //  fileWrite2 = new File_Writter(model);
         //  model.stopLoopFlag = true;
-         fileWrite.logfileOgnizer("C:\\Users\\boyco\\Desktop\\","logData.txt");
+         fileWrite.logfileOgnizer("C:\\Users\\boyco\\Documents\\[Java_Import_folder]\\logdata\\","logData.txt");
 
+         fileWrite.initialFile();
     }
     
     
@@ -82,6 +85,7 @@ public class GUI_Controller {
     
         print("initializing all the data");
         
+        /*
         model.setInitialTmap();  
         model.roi_tmapData = model.roiCropper(model.tmapData,model.roi_start_point, model.roi_window_size);
         model.roi_tmapImag = model.arrary2BuffImage(model.roi_tmapData, 20);
@@ -89,21 +93,21 @@ public class GUI_Controller {
 
         updateStatus();
         view.resetChart();
-        
+        */
+        ipcCLIENT.initializeAllDicomFile();
+        view.setMyText("File initialization was called !!");
 
     }
     
-    private void deleteAllfiles(){
-    
-    
-    
-    }
+   
     
     public void updateStatus(){
         
         model.updateTracker();
         pidControl.setNewDutyCycle(model.max_temp);
-           
+          
+        //model.pidOutput = pidControl2.doPID(model.max_temp);
+                
         fileWrite.logSaveData();
         
         model.resizeTmapForPlot(model.croppedTmapSize[0],model.croppedTmapSize[1],5);

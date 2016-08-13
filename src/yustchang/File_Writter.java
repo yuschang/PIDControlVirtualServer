@@ -40,10 +40,7 @@ public class File_Writter {
         System.out.println(input);
     }
 
-    
-    
-    
-            
+       
     public void logfileOgnizer(String dirName, String fileName){
     
            // String dirName = "C:\\Users\\boyco\\Desktop\\";
@@ -51,6 +48,12 @@ public class File_Writter {
             File dir = new File (dirName);
             actualFile = new File (dir, fileName);
             
+    }
+    public void initialFile(){
+        if(actualFile.exists()){
+            actualFile.delete();
+        }
+    
     }
             
     

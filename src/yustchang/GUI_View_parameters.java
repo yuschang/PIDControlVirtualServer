@@ -12,13 +12,14 @@ package yustchang;
 public class GUI_View_parameters extends javax.swing.JFrame {
 
     GUI_Model model;
+
     /**
      * Creates new form GUI_view_parameters
      */
     public GUI_View_parameters(GUI_Model model) {
         initComponents();
         this.model = model;
-        
+
     }
 
     /**
@@ -259,8 +260,10 @@ public class GUI_View_parameters extends javax.swing.JFrame {
 
     }
     
-    private void setdefaultParameter(){
-    
+    private void setdefaultParameter(){           
+                
+        model.filesWillSavedDirectory = "C:\\Users\\boyco\\Documents\\[Java_Import_folder]\\newdcm\\" ;
+         
         model.baseTemp = 36;
         model.roi_start_point = 128;
         model.roi_window_size = 5 ;
@@ -269,14 +272,15 @@ public class GUI_View_parameters extends javax.swing.JFrame {
         
         model.targetDose = 100 ;
         model.targetDose -= model.getCooldownDose(model.baseTemp);
-        model.targetTemp = 48 ;
+        model.targetTemp = 50 ;
         model.roi_doseMap = new double[model.roi_window_size*2+1][model.roi_window_size*2+1];
         model.g_roi_doseMap = new double[model.roi_window_size*2+1][model.roi_window_size*2+1];
         
-        model.pGain = 1.5;
-        model.iGain = 1.2;
-        model.dGain = 0.7;    
-        
+  
+        model.pGain = 5;
+        model.iGain = 2.5;
+        model.dGain = 0;    
+       
         model.roiGaussianFilterRequired = true;
         
         setText("*** Initial parameter were defined : ");

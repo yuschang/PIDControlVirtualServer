@@ -57,8 +57,9 @@ public class GUI_Demo {
                 GUI_View view = new GUI_View(model);
                 GUI_View_parameters view_parameter = new GUI_View_parameters(model);
                 PID_Controller pidControl = new PID_Controller(model);
+                
                 IPC_ClientControl ipcCLIENT = new IPC_ClientControl(model);
-
+      
                 GUI_Controller controller = new GUI_Controller(view, model, ipcCLIENT, pidControl, view_parameter);
                 // for 2 way referencing of VIEW and CONTROL class
                 view.setController(controller);

@@ -43,6 +43,7 @@ public class GUI_Model {
    public double max_temp;
    public double mean_temp;
    public double pid_Input;
+   public double max_temp_based_dose;
 
    public float baseTemp;
    
@@ -95,6 +96,8 @@ public class GUI_Model {
        rectangCoordi = new int[4];
        roiGaussianFilterRequired = false;
        stopProcess = false;
+       
+       thermalDose = 0;
        
        
    }
@@ -346,7 +349,6 @@ public class GUI_Model {
                 
                 // for gaussian filtered CEM map
                 g_avTemp = gaussian3(i,j,tmapData);
-                print("!!! g_avTemp is :" + g_avTemp);
                 g_roi_doseMap[i-startPoint][j-startPoint] += getPixelDose(g_avTemp); 
                 
                 if(g_avTemp > g_maxAvt){   
@@ -386,6 +388,9 @@ public class GUI_Model {
     roi_doseMapImag = arrary2BuffImage(double2Float(roi_doseMap),10);
     
     maxDoseTracker();
+    
+    max_temp_based_dose += getPixelDose(max_temp);
+    
     
     }
     
@@ -458,7 +463,7 @@ public class GUI_Model {
     }
     
     thermalDose = maxDose ;
-    // thermalDose = maxDose;
+
  
     }
     
@@ -496,12 +501,11 @@ public class GUI_Model {
             pixelDose = (3.7/60)*Math.pow(0.5, (43-pixeltemp)) ;     
         }
         
-        
     return pixelDose;
     }
     
     public void updateTracker(){
-    
+        
     rectangCoordi = rectangleCoordiConvertor();     
     
     if(roiGaussianFilterRequired == true){

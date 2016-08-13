@@ -45,8 +45,8 @@ public class IPC_ClientControl implements Runnable {
         fileCount = 1;
         this.fileWrite = fileWrite;
         
-       // fileWrite = new File_Writter(model);
-     //   fileWrite.logfileOgnizer("C:\\Users\\boyco\\Desktop\\","logData.txt");
+       // initializeAllDicomFile();
+     
 
     }
     
@@ -69,7 +69,8 @@ public class IPC_ClientControl implements Runnable {
      currentFrameNPluss= 0;
      SeiralTriggered = false;
      stop = false;
-     
+          
+         
     }
     
     
@@ -108,8 +109,7 @@ public class IPC_ClientControl implements Runnable {
     
     public void writeByteData2Dcm(byte[] fileArray, String fileName){
     
-                model.filesWillSavedDirectory = "C:\\Users\\boyco\\Documents\\[Java_Import_folder]\\newdcm\\" ;
-                
+                            
                 String TotalFileName = model.filesWillSavedDirectory + fileName;
                 //BufferedOutputStream bs;
                 try{
@@ -130,6 +130,46 @@ public class IPC_ClientControl implements Runnable {
               
 
     }
+    
+    public void initializeAllDicomFile(){
+
+        String dir = "C:\\Users\\boyco\\Documents\\[Java_Import_folder]\\newdcm";
+         
+
+        while(deleteFilesInthefolder(dir)>=1){
+            while(deleteFilesInthefolder(dir)>=1){
+                deleteFilesInthefolder(dir);    
+            }
+        }
+   
+    
+   
+    }
+    private int deleteFilesInthefolder(String folderAddress){
+        
+        int count = 0;
+           
+        File fileAdrees = new File (folderAddress);
+        String [] fileList = fileAdrees.list();
+       
+        System.out.println( "Data numer to be deleted: " + fileAdrees.list().length); 
+        if(fileList.length >=1 ){
+           
+            for(int i = 0; i<fileAdrees.list().length; i++){
+                  
+                File fileAdreesN = new File(folderAddress,fileList[i]);
+                
+                fileAdreesN.delete();
+                count++;
+                System.out.println( fileList[i] + " was deleted ! ");
+                
+            }
+             System.out.println( "total number of deleteded file is: "+ count);
+ 
+        }
+    return count-fileAdrees.list().length;
+    }
+    
     
     
     public static int byteArrayToInt(byte[] bytes) 
@@ -312,7 +352,7 @@ public class IPC_ClientControl implements Runnable {
 
       
     public void run(){
-        
+       
 
         while(true){
          

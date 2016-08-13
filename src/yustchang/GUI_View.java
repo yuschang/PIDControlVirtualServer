@@ -47,12 +47,13 @@ public class GUI_View extends javax.swing.JFrame {
     private TimeSeries series2;
     private TimeSeries series3;
     private TimeSeries series4;
+    private TimeSeries series5;
     
     private boolean roiPlotFlag;
 
     public String msg_GUIimported;
     
-    int SUBPLOT_COUNT= 4;
+    int SUBPLOT_COUNT= 5;
     
     /** The datasets. */
     public TimeSeriesCollection[] datasets;
@@ -230,12 +231,15 @@ public class GUI_View extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
                     .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(7, 7, 7)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
-                        .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(17, 17, 17))
         );
 
@@ -458,8 +462,7 @@ public class GUI_View extends javax.swing.JFrame {
         final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(new DateAxis("Time"));
         this.datasets = new TimeSeriesCollection[SUBPLOT_COUNT];
             
-            final NumberAxis rangeAxis = new NumberAxis("Temperature ");
-            rangeAxis.setAutoRangeIncludesZero(false);
+
         
             series1 = new TimeSeries("MeanTemp " , Millisecond.class);
             this.datasets[0] = new TimeSeriesCollection(series1);
@@ -469,19 +472,24 @@ public class GUI_View extends javax.swing.JFrame {
             this.datasets[2] = new TimeSeriesCollection(series3);
             series4 = new TimeSeries("PID output", Millisecond.class);
             this.datasets[3] = new TimeSeriesCollection(series4);
+            series5 = new TimeSeries("PID output", Millisecond.class);
+            this.datasets[4] = new TimeSeriesCollection(series5);
        
             
             final XYLineAndShapeRenderer renderer0 = new XYLineAndShapeRenderer();
             final XYLineAndShapeRenderer renderer1 = new XYLineAndShapeRenderer();
             final XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer();
             final XYLineAndShapeRenderer renderer3 = new XYLineAndShapeRenderer();
-               
+            final XYLineAndShapeRenderer renderer4 = new XYLineAndShapeRenderer();
+            
+            final NumberAxis rangeAxis = new NumberAxis("Temperature [C] ");
+            rangeAxis.setAutoRangeIncludesZero(false);      
             // for figure 1 and 2
             final XYPlot subplot = new XYPlot(
                     this.datasets[0], null, rangeAxis, new StandardXYItemRenderer()
             );
             subplot.setDataset(1,datasets[1]);
-        
+ 
             subplot.setRenderer(0, renderer0);
             subplot.setRenderer(1, renderer1);
             subplot.getRendererForDataset(subplot.getDataset(0)).setSeriesPaint(0,Color.BLUE);
@@ -492,27 +500,32 @@ public class GUI_View extends javax.swing.JFrame {
             subplot.setRangeGridlinePaint(Color.GRAY);
             plot.add(subplot);
 
-            // for figure 3
-            final NumberAxis rangeAxis2 = new NumberAxis("CEM");
-            // rangeAxis2.setAutoRangeIncludesZero(true);
-            rangeAxis2.setAutoRange(true);
+            // for figure 3 and 4
+            final NumberAxis rangeAxis2 = new NumberAxis("Termal dose [CEM]");
+            rangeAxis2.setAutoRangeIncludesZero(true);
             final XYPlot subplot2 = new XYPlot(
                     this.datasets[2], null, rangeAxis2, new StandardXYItemRenderer()
             );
-            subplot2.setRenderer(2, renderer2);
+            subplot2.setDataset(1,datasets[3]);
+        
+            subplot2.setRenderer(0, renderer2);
+            subplot2.setRenderer(1, renderer3);
             subplot2.getRendererForDataset(subplot2.getDataset(0)).setSeriesPaint(0,Color.BLACK);
+            subplot2.getRendererForDataset(subplot2.getDataset(1)).setSeriesPaint(0,Color.RED);
+            
             subplot2.setBackgroundPaint(Color.white);
             subplot2.setDomainGridlinePaint(Color.GRAY);
             subplot2.setRangeGridlinePaint(Color.GRAY);
             plot.add(subplot2);
 
-            // for figure 4       
-            final NumberAxis rangeAxis3 = new NumberAxis("Duty Cycle");
-            rangeAxis3.setAutoRangeIncludesZero(true);
+            // for figure 5       
+            final NumberAxis rangeAxis3 = new NumberAxis("Duty Cycle [%]");
+           //  rangeAxis3.setAutoRangeIncludesZero(true);
+            rangeAxis3.setRange(0, 100);
             final XYPlot subplot3 = new XYPlot(
-                    this.datasets[3], null, rangeAxis3, new StandardXYItemRenderer()
+                    this.datasets[4], null, rangeAxis3, new StandardXYItemRenderer()
             );
-            subplot3.setRenderer(3, renderer3);
+            subplot3.setRenderer(0, renderer4);
             subplot3.getRendererForDataset(subplot3.getDataset(0)).setSeriesPaint(0,Color.BLACK);
             subplot3.setBackgroundPaint(Color.white);
             subplot3.setDomainGridlinePaint(Color.GRAY);
@@ -558,10 +571,12 @@ public class GUI_View extends javax.swing.JFrame {
         
         lastValue[2] = model.thermalDose;         
         datasets[2].getSeries(0).add(new Millisecond(), lastValue[2]);  
+        lastValue[3] = model.max_temp_based_dose;         
+        datasets[3].getSeries(0).add(new Millisecond(), lastValue[3]); 
         
         // lastValue[3] = 100 * (0.90 + 0.2 * Math.random());    
-        lastValue[3] = model.pidOutput;
-        datasets[3].getSeries(0).add(new Millisecond(), lastValue[3]);  
+        lastValue[4] = model.pidOutput;
+        datasets[4].getSeries(0).add(new Millisecond(), lastValue[4]);  
                 
     }
     
