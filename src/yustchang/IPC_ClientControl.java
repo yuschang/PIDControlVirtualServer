@@ -3,6 +3,8 @@ package yustchang;
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -15,8 +17,10 @@ public class IPC_ClientControl implements Runnable {
      
     private Thread thread;
     private Socket socket;
+    private Socket socket2;
     private DataInputStream in;
     private DataOutputStream out;
+    private DataOutputStream out2;
 
     
     public int currentFrameN;
@@ -47,7 +51,6 @@ public class IPC_ClientControl implements Runnable {
         
        // initializeAllDicomFile();
      
-
     }
     
     
@@ -69,8 +72,7 @@ public class IPC_ClientControl implements Runnable {
      currentFrameNPluss= 0;
      SeiralTriggered = false;
      stop = false;
-          
-         
+               
     }
     
     
@@ -96,6 +98,49 @@ public class IPC_ClientControl implements Runnable {
        } 
 
     }
+  
+    public void setupMRIConnection(){
+        
+        // send command to MRI socket
+        socket = new Socket();
+        try {
+  
+            InetSocketAddress socketAddress = new InetSocketAddress("10.0.1.1",15555);
+            socket.connect(socketAddress);
+            out2 = new DataOutputStream(socket.getOutputStream());
+            
+            out2.writeUTF("INIT 56267A110651\n");
+
+        } catch (IOException ex) {
+            Logger.getLogger(IPC_ClientControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        // Create socket, bind to your own computer's IP, on port 16001
+        socket2 = new Socket();
+        // let MRI send data to here
+        try{
+        
+            InetSocketAddress socketAddress2 = new InetSocketAddress("10.0.1.223",16001);
+            socket2.connect(socketAddress2);
+            out =  new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
+            
+            // Tell the MRI listener to connect to us, on the port we specified above
+            out.writeUTF("CONN 1 "+ Integer.toString(16001) +"\n");
+            
+            // Tell the MRI to start sending us images when it gets them
+            out.writeUTF("START 1\n");
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(IPC_ClientControl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+       
+    
+    
+    }
+    
     
     public void sendText(String sedingTxt){
             
@@ -108,8 +153,7 @@ public class IPC_ClientControl implements Runnable {
     }
     
     public void writeByteData2Dcm(byte[] fileArray, String fileName){
-    
-                            
+                    
                 String TotalFileName = model.filesWillSavedDirectory + fileName;
                 //BufferedOutputStream bs;
                 try{
@@ -127,7 +171,6 @@ public class IPC_ClientControl implements Runnable {
                 } catch(Exception e){
                     print("error occured during file saving");
                 } 
-              
 
     }
     
@@ -141,10 +184,9 @@ public class IPC_ClientControl implements Runnable {
                 deleteFilesInthefolder(dir);    
             }
         }
-   
-    
-   
+
     }
+    
     private int deleteFilesInthefolder(String folderAddress){
         
         int count = 0;
@@ -236,49 +278,6 @@ public class IPC_ClientControl implements Runnable {
             print("the dcm iamge "+ fileCount +" was saved <--");
 
             
-            /*
-            // **** byte array append method 2
-            /// read rest of the bytes
-            int bytes_recd  = 4;
-            ByteArrayBuffer mReadBuffer = new ByteArrayBuffer(dataLength);      
-            mReadBuffer.append(first4zeros,0,first4zeros.length);
-            
-          
-            
-            mReadBuffer.append(first4zeros, 0 ,4);
-                       
-            while(bytes_recd < dataLength){
-                
-                try {
-                    int tmpReadDataSize = Math.min(dataLength - bytes_recd , 2048);
-                    byte chunk[] = new byte[tmpReadDataSize];
-                    // read in the chunk from socket
-                    int nBytesRead = in.read(chunk, 0, tmpReadDataSize);
-                    
-                    // in.read(chunk, 0, tmpReadDataSize);
-                    // append chunk to arrayBuffer
-                    mReadBuffer.append(chunk,0,nBytesRead);
-                    bytes_recd += nBytesRead;
-                 
-        
-                } catch (IOException ex) {
-                    System.err.println(" Socket error: can not read byte data after reading image data size");
-                }
-                
-            }
-
-            importedByteData = mReadBuffer.buffer();
-                        
-            mReadBuffer.clear();
-            
-            String fileName = fileCount+".dcm";
-            writeByteData2Dcm(importedByteData,fileName);
-            
-            
-            view.setMyText("File "+fileName + " was saved");
-            System.out.println("the dcm iamge "+ fileCount +" was saved <--");
-
-          */
     }
     
     
@@ -352,7 +351,6 @@ public class IPC_ClientControl implements Runnable {
 
       
     public void run(){
-       
 
         while(true){
          
@@ -378,7 +376,6 @@ public class IPC_ClientControl implements Runnable {
             
         }
    
-    
     }
     
 
