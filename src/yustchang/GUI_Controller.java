@@ -23,10 +23,12 @@ public class GUI_Controller {
     private File_Writter fileWrite2;  
     private IPC_ClientControl ipcCLIENT; 
     private GUI_View_parameters view_parameter;
+    private Serial_PortControl serialPort;
  
     
     // constructor
-    public GUI_Controller(GUI_View view, GUI_Model model, IPC_ClientControl ipcCLIENT, PID_Controller pidControl, GUI_View_parameters view_parameter){
+    public GUI_Controller(GUI_View view, GUI_Model model, IPC_ClientControl ipcCLIENT, PID_Controller pidControl,
+                GUI_View_parameters view_parameter,Serial_PortControl serialPort){
       
         this.model = model;
         this.view = view;
@@ -35,6 +37,7 @@ public class GUI_Controller {
         this.fileWrite = fileWrite;
         this.ipcCLIENT = ipcCLIENT;
         this.view_parameter = view_parameter;
+        this.serialPort = serialPort;
 
         // chart = new GUI_Chart("Moniter");
         
@@ -62,6 +65,12 @@ public class GUI_Controller {
          print(" start called !");
      
      }          
+    
+    public void connectArduino(){
+        
+        serialPort.connectSerial();
+     
+    }
      
      
     public void startToRun(){
@@ -105,9 +114,11 @@ public class GUI_Controller {
         
         model.updateTracker();
         pidControl.setNewDutyCycle(model.max_temp);
-          
+        
+        
         //model.pidOutput = pidControl2.doPID(model.max_temp);
-                
+        serialPort.serialSendMessage(model.pidOutput);
+        
         fileWrite.logSaveData();
         
         model.resizeTmapForPlot(model.croppedTmapSize[0],model.croppedTmapSize[1],5);
