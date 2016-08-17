@@ -406,7 +406,9 @@ public class GUI_View extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:  
-        control.startsocket();
+        control.initializeThesocket();
+        System.out.println("connection to server was called");
+        control.connectArduino();
         setMyText("Socket connection was sent out!");
         
     }//GEN-LAST:event_jButton6ActionPerformed

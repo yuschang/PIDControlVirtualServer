@@ -17,7 +17,8 @@ public class GUI_Controller {
     private GUI_View view;
     private Timer timer;
     private PID_Controller pidControl;
-
+    private  IPC_Client_Initialize ipcCLIENT_ini;
+    
     private GUI_Chart chart;
     private File_Writter fileWrite;
     private File_Writter fileWrite2;  
@@ -27,7 +28,7 @@ public class GUI_Controller {
  
     
     // constructor
-    public GUI_Controller(GUI_View view, GUI_Model model, IPC_ClientControl ipcCLIENT, PID_Controller pidControl,
+    public GUI_Controller(GUI_View view, GUI_Model model, IPC_ClientControl ipcCLIENT,  IPC_Client_Initialize ipcCLIENT_ini, PID_Controller pidControl,
                 GUI_View_parameters view_parameter,Serial_PortControl serialPort){
       
         this.model = model;
@@ -38,6 +39,7 @@ public class GUI_Controller {
         this.ipcCLIENT = ipcCLIENT;
         this.view_parameter = view_parameter;
         this.serialPort = serialPort;
+        this.ipcCLIENT_ini = ipcCLIENT_ini;
 
         // chart = new GUI_Chart("Moniter");
         
@@ -59,12 +61,14 @@ public class GUI_Controller {
 
     }
     
-    public void  startsocket(){
-         
-         ipcCLIENT.startSocket();
-         print(" start called !");
-     
+    public void  initializeThesocket(){
+        
+         ipcCLIENT_ini.setupMRICommandSocket();
+         ipcCLIENT_ini.setupMRIDataSocket();
+        
+         print("Connect to mri was called");
      }          
+    
     
     public void connectArduino(){
         
@@ -75,9 +79,12 @@ public class GUI_Controller {
      
     public void startToRun(){
         
-        ipcCLIENT.sendText("10101010");
-        view.setMyText("Client sent requested the server to start RUN " );
-    
+        // ipcCLIENT.sendText("10101010");
+
+        ipcCLIENT_ini.sendSTARTMessage();
+        ipcCLIENT.startSocket();   
+  
+
     }
 
     
@@ -86,7 +93,6 @@ public class GUI_Controller {
         view_parameter.setVisible(true);
         
        //  model.initializeCEM();
-
 
     }
     

@@ -30,6 +30,7 @@ public class Serial_PortControl {
     private void print(String input){
         System.out.println(input);
     }
+    
     public void connectSerial(){
    
         try{
@@ -50,6 +51,7 @@ public class Serial_PortControl {
             print("Error: Serial Port is not connected!!");
         }
        }
+   
     
     public void serialSendMessage(double input){
         
@@ -73,10 +75,7 @@ public class Serial_PortControl {
         
         }
         
-        
-        
-       
-    
+   
     }
     
     public void closeSerial(){

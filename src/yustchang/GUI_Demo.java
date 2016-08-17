@@ -52,20 +52,23 @@ public class GUI_Demo {
         
         SwingUtilities.invokeLater(new Runnable(){
           public void run(){
-              
+                         
                 GUI_Model model = new GUI_Model();
+                
+                Serial_PortControl serialPort = new Serial_PortControl();
                 GUI_View view = new GUI_View(model);
                 GUI_View_parameters view_parameter = new GUI_View_parameters(model);
                 PID_Controller pidControl = new PID_Controller(model);
                 
-                IPC_ClientControl ipcCLIENT = new IPC_ClientControl(model);
+                IPC_Client_Initialize ipcCLIENT_ini = new IPC_Client_Initialize(model);
+                IPC_ClientControl ipcCLIENT = new IPC_ClientControl(model,ipcCLIENT_ini);
       
-                GUI_Controller controller = new GUI_Controller(view, model, ipcCLIENT, pidControl, view_parameter);
+                GUI_Controller controller = new GUI_Controller(view, model, ipcCLIENT,ipcCLIENT_ini, pidControl, view_parameter, serialPort);
                 // for 2 way referencing of VIEW and CONTROL class
                 view.setController(controller);
 
                 ipcCLIENT.setController(controller);
-
+                
                 // new Base_Frame().setVisible(true);
                 view.setVisible(true);
 

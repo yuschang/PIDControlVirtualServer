@@ -7,27 +7,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-
-public class IPC_ClientControl implements Runnable {
+class IPC_ClientControl implements Runnable {
 
 
     private GUI_Controller control;
     private GUI_Model model;
     private File_Writter fileWrite;
+    private IPC_Client_Initialize ipcCLIENT_ini;
      
     private Thread thread;
     private Socket socket;
-    private Socket socket2;
     private DataInputStream in;
     private DataOutputStream out;
-    private DataOutputStream out2;
 
     
     public int currentFrameN;
     public int currentFrameNPluss;
     public  boolean SeiralTriggered;
-    
-    
+
     private static final String IP_ADDRESS = "localhost";
     
     private int dataLength;
@@ -41,9 +38,10 @@ public class IPC_ClientControl implements Runnable {
     private volatile boolean stop;
     
     
-    public IPC_ClientControl(GUI_Model model){
+    public IPC_ClientControl(GUI_Model model, IPC_Client_Initialize ipcCLIENT_ini){
         
         this.model= model;
+        this.ipcCLIENT_ini = ipcCLIENT_ini;
         init(); 
         frameCount = 1;
         fileCount = 1;
@@ -77,11 +75,11 @@ public class IPC_ClientControl implements Runnable {
     
     
     public void startSocket(){
-    
+        
     try{
        if(!socket.isConnected()){
             InetAddress address = InetAddress.getByName(IP_ADDRESS);
-            InetSocketAddress socketAddress = new InetSocketAddress(address,2000);
+            InetSocketAddress socketAddress = new InetSocketAddress(address,ipcCLIENT_ini.newSocket);
             socket.connect(socketAddress);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
@@ -90,7 +88,10 @@ public class IPC_ClientControl implements Runnable {
              thread = new Thread(this);
             }
             thread.start();
-            print(" connected to server !!");
+            
+            ipcCLIENT_ini.sendSTARTMessage();
+      
+            print(" connect call sent to the server !!");
         }
        }catch(Exception e){
            System.out.println(e);
@@ -98,59 +99,20 @@ public class IPC_ClientControl implements Runnable {
        } 
 
     }
-  
-    public void setupMRIConnection(){
+    
         
-        // send command to MRI socket
-        socket = new Socket();
-        try {
-  
-            InetSocketAddress socketAddress = new InetSocketAddress("10.0.1.1",15555);
-            socket.connect(socketAddress);
-            out2 = new DataOutputStream(socket.getOutputStream());
-            
-            out2.writeUTF("INIT 56267A110651\n");
-
-        } catch (IOException ex) {
-            Logger.getLogger(IPC_ClientControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        // Create socket, bind to your own computer's IP, on port 16001
-        socket2 = new Socket();
-        // let MRI send data to here
-        try{
-        
-            InetSocketAddress socketAddress2 = new InetSocketAddress("10.0.1.223",16001);
-            socket2.connect(socketAddress2);
-            out =  new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
-            
-            // Tell the MRI listener to connect to us, on the port we specified above
-            out.writeUTF("CONN 1 "+ Integer.toString(16001) +"\n");
-            
-            // Tell the MRI to start sending us images when it gets them
-            out.writeUTF("START 1\n");
-            
-            
-        } catch (IOException ex) {
-            Logger.getLogger(IPC_ClientControl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            
-       
-    
-    
-    }
-    
-    
     public void sendText(String sedingTxt){
+               
+        try{  
+            out.writeUTF(sedingTxt);    
             
-          try{
-           out.writeUTF(sedingTxt);           
-           }catch(Exception e){
+        }catch(Exception e){
            e.printStackTrace();
-          }
+        }
            
     }
+    
+    
     
     public void writeByteData2Dcm(byte[] fileArray, String fileName){
                     
@@ -214,8 +176,7 @@ public class IPC_ClientControl implements Runnable {
     
     
     
-    public static int byteArrayToInt(byte[] bytes) 
-{
+    public static int byteArrayToInt(byte[] bytes){
     return  /* bytes[3] & 0xFF |
             (bytes[2] & 0xFF) << 8 |
             (bytes[1] & 0xFF) << 16 |
@@ -223,8 +184,7 @@ public class IPC_ClientControl implements Runnable {
             
           ((bytes[0] & 0xff) << 24) | ((bytes[1] & 0xff) << 16) |
           ((bytes[2] & 0xff) << 8)  | (bytes[3] & 0xff);
-    
-}
+    }
         
     
     public void readByteFromSocket2(int fileCount){
@@ -343,16 +303,15 @@ public class IPC_ClientControl implements Runnable {
     
 
     public void stopCalledFromView(){
-
         stop = true;
-    
-    }
-    
 
-      
+    }
+
+    
     public void run(){
 
-        while(true){
+        print("Client controller has been called!! ");
+           while(true){
          
             
             while(model.stopProcess == false ){
@@ -375,12 +334,13 @@ public class IPC_ClientControl implements Runnable {
             }
             
         }
-   
+           
+
     }
     
 
-  
 }
+
 
 
 
